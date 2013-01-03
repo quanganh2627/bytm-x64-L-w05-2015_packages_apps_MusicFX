@@ -1,3 +1,5 @@
+ifneq ($(strip $(USE_INTEL_LVSE)),true)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -10,3 +12,5 @@ LOCAL_JAVA_LIBRARIES := framework
 LOCAL_PACKAGE_NAME := MusicFX
 
 include $(BUILD_PACKAGE)
+
+endif
