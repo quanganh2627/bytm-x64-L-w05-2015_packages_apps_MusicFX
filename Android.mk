@@ -1,3 +1,5 @@
+ifneq ($(strip $(USE_INTEL_LVSE)),true)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -12,3 +14,5 @@ LOCAL_PACKAGE_NAME := MusicFX
 LOCAL_PRIVILEGED_MODULE := true
 
 include $(BUILD_PACKAGE)
+
+endif
