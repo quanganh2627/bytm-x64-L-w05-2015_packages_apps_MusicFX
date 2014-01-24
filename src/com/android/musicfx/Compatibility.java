@@ -12,6 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This file was modified by Dolby Laboratories, Inc. The portions of the
+ * code that are surrounded by "DOLBY..." are copyrighted and
+ * licensed separately, as follows:
+ *
+ * (C) 2011-2013 Dolby Laboratories, Inc.
+ * All rights reserved.
+ *
+ * This program is protected under international and U.S. Copyright laws as
+ * an unpublished work. This program is confidential and proprietary to the
+ * copyright owners. Reproduction or disclosure, in whole or in part, or the
+ * production of derivative works therefrom without the express permission of
+ * the copyright owners is prohibited.
+ *
  */
 
 package com.android.musicfx;
@@ -29,8 +43,14 @@ import android.content.pm.ResolveInfo;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Bundle;
+//DOLBY_DAP_GUI
+import android.os.SystemProperties;
+//DOLBY_DAP_GUI END
 import android.util.Log;
 
+//DOLBY_DAP_GUI
+import com.android.musicfx.CompatibilityHelper;
+//DOLBY_DAP_GUI END
 import java.util.List;
 
 /**
@@ -49,6 +69,9 @@ public class Compatibility {
     // run "setprop log.tag.MusicFXCompat DEBUG" to turn on logging
     private final static boolean LOG = Log.isLoggable(TAG, Log.DEBUG);
 
+    //DOLBY_DAP_GUI
+    private static CompatibilityHelper mCompatibilityHelper;
+    //DOLBY_DAP_GUI END
 
     /**
      * This activity has an intent filter with the highest possible priority, so
@@ -68,14 +91,22 @@ public class Compatibility {
             String defName = pref.getString("defaultpanelname", null);
             log("read " + defPackage + "/" + defName + " as default");
             if (defPackage == null || defName == null) {
-                Log.e(TAG, "no default set!");
-                // use the built-in panel
-                i.setComponent(new ComponentName(this, ActivityMusic.class));
-                // also save it as the default
-                Intent updateIntent = new Intent(this, Service.class);
-                updateIntent.putExtra("defPackage", getPackageName());
-                updateIntent.putExtra("defName", ActivityMusic.class.getName());
-                startService(updateIntent);
+                if (SystemProperties.getBoolean("dolby.ds1.enable", false)) {
+                    // DOLBY_DAP_GUI
+                    // use dolby panel
+                    mCompatibilityHelper = new CompatibilityHelper();
+                    i.setComponent(new ComponentName(mCompatibilityHelper.getDefPackage(),
+                                                     mCompatibilityHelper.getDefName()));
+                    // DOLBY_DAP_GUI END
+                } else {
+                    // use the built-in panel
+                    i.setComponent(new ComponentName(this, ActivityMusic.class));
+                    // also save it as the default
+                    Intent updateIntent = new Intent(this, Service.class);
+                    updateIntent.putExtra("defPackage", getPackageName());
+                    updateIntent.putExtra("defName", ActivityMusic.class.getName());
+                    startService(updateIntent);
+                }
             } else {
                 i.setComponent(new ComponentName(defPackage, defName));
             }
@@ -190,8 +221,17 @@ public class Compatibility {
             // Now that we have selected a default control panel activity, ensure
             // that the broadcast receiver(s) in that same package are enabled,
             // and the ones in the other packages are disabled.
-            String defPackage = defPanel.activityInfo.packageName;
-            String defName = defPanel.activityInfo.name;
+            String defPackage = null;
+            String defName = null;
+            if (!SystemProperties.getBoolean("dolby.ds1.enable", false)) {
+                defPackage = defPanel.activityInfo.packageName;
+                defName = defPanel.activityInfo.name;
+            } else {
+                // DOLBY_DAP_GUI
+                defPackage = mCompatibilityHelper.getDefPackage();
+                defName = mCompatibilityHelper.getDefName();
+                // DOLBY_DAP_GUI END
+            }
             setDefault(defPackage, defName);
         }
 
