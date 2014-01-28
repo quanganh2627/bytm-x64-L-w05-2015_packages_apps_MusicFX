@@ -17,7 +17,7 @@
  * code that are surrounded by "DOLBY..." are copyrighted and
  * licensed separately, as follows:
  *
- * (C) 2011-2013 Dolby Laboratories, Inc.
+ * (C) 2011-2014 Dolby Laboratories, Inc.
  * All rights reserved.
  *
  * This program is protected under international and U.S. Copyright laws as
@@ -110,7 +110,19 @@ public class Compatibility {
             } else {
                 i.setComponent(new ComponentName(defPackage, defName));
             }
-            startActivity(i);
+            if (SystemProperties.getBoolean("dolby.ds1.enable", false)) {
+                // DOLBY_DAP_GUI
+                PackageManager pm = getPackageManager();
+                mCompatibilityHelper.getPkgInfo(pm);
+                try {
+                    startActivity(i);
+                } catch(Exception e) {
+                    mCompatibilityHelper.log();
+                }
+                //DOLBY_DAP_GUI END
+            } else {
+                startActivity(i);
+            }
             finish();
         }
     }
