@@ -17,6 +17,8 @@
 //DOLBY_DAP_GUI
 package com.android.musicfx;
 
+import android.content.pm.PackageManager;
+
 public class CompatibilityHelper {
     String defPackage, defName;
 
@@ -29,6 +31,12 @@ public class CompatibilityHelper {
 
     public String getDefName() {
         return defName;
+    }
+
+    public void getPkgInfo(PackageManager pM) {
+    }
+
+    public void log() {
     }
 }
 //DOLBY_DAP_GUI END
