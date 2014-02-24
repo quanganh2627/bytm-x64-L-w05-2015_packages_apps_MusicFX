@@ -110,19 +110,7 @@ public class Compatibility {
             } else {
                 i.setComponent(new ComponentName(defPackage, defName));
             }
-            if (SystemProperties.getBoolean("dolby.ds1.enable", false)) {
-                // DOLBY_DAP_GUI
-                PackageManager pm = getPackageManager();
-                mCompatibilityHelper.getPkgInfo(pm);
-                try {
-                    startActivity(i);
-                } catch(Exception e) {
-                    mCompatibilityHelper.log();
-                }
-                //DOLBY_DAP_GUI END
-            } else {
-                startActivity(i);
-            }
+            startActivity(i);
             finish();
         }
     }
@@ -240,6 +228,9 @@ public class Compatibility {
                 defName = defPanel.activityInfo.name;
             } else {
                 // DOLBY_DAP_GUI
+                if (mCompatibilityHelper == null) {
+                    mCompatibilityHelper = new CompatibilityHelper();
+                }
                 defPackage = mCompatibilityHelper.getDefPackage();
                 defName = mCompatibilityHelper.getDefName();
                 // DOLBY_DAP_GUI END
